@@ -7,34 +7,34 @@ You can read the API documentation by visiting [this link](https://omnitrade.io/
 
 You can use in your project adding the dependency on `pubspec.yml`
 
-````yml
+```yml
 dependencies:
   ...
   omnitrade_client:
     git: https://github.com/OmniTrade/client-dart
-````
+```
 
 ## Usage example
 
 1. Import package to use it
 
-````dart
+```dart
 import 'package:omnitrade_client/omnitrade_client.dart';
-````
+```
 
 2. Create new instance of OmniTrade Client
 
-````dart
+```dart
 final client = OmniTradeClient();
-```` 
+``` 
 
 3. Call Api method that you need
 
-`````dart
+````dart
 Future<void> yourFunction() async {
   final response = await client.fetchMarkets();
 }
-`````
+````
 
 ## Available methods
 
