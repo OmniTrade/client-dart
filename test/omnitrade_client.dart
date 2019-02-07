@@ -4,6 +4,17 @@ import 'package:http/testing.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
 
+MockClient mockHttp({MockClientHandler handleRequest, String method, String url}) => MockClient(
+  (request) async {
+    if (request.toString() == '$method $url') {
+      return handleRequest(request);
+    }
+    return Response('$method $url is different: $request', 404);
+  }
+);
+
+const String baseUrl = 'https://omnitrade.io/api/v2';
+
 void main() {
   group('fetchMarkets', () {
     test('it returns list with markets', () async {
@@ -11,8 +22,10 @@ void main() {
         {'id': 'btcbrl', 'name': 'BTC/BRL'}, {'id': 'ltcbrl', 'name': 'LTC/BRL'}
       ];
 
-      final client = MockClient((request) async =>
-        Response(json.encode(expectedResult), 200)
+      final client = mockHttp(
+        handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+        method: 'GET',
+        url: '$baseUrl/markets'
       );
 
       final omniClient = OmniTradeClient(httpClient: client);
@@ -38,8 +51,10 @@ void main() {
         }
       };
 
-      final client = MockClient((request) async =>
-        Response(json.encode(expectedResult), 200)
+      final client = mockHttp(
+        handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+        method: 'GET',
+        url: '$baseUrl/tickers'
       );
 
       final omniClient = OmniTradeClient(httpClient: client);
@@ -50,7 +65,7 @@ void main() {
 
   group('fetchTicketsFromMarket', () {
     group('when market is invalid', () {
-      test('it returns status 404', () async {
+      test('it returns status 404', () {
         final expectedResult = {
           "error": {
             "code": 1002,
@@ -58,8 +73,10 @@ void main() {
           }
         };
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 404)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 404),
+          method: 'GET',
+          url: '$baseUrl/tickers/anything'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
@@ -82,12 +99,14 @@ void main() {
           }
         };
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 200)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+          method: 'GET',
+          url: '$baseUrl/tickers/btcbrl'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
-        final subject = (await omniClient.fetchTicketsFromMarket('anything')).body;
+        final subject = (await omniClient.fetchTicketsFromMarket('btcbrl')).body;
         expect(subject, expectedResult);
       });
     });
@@ -102,8 +121,10 @@ void main() {
           "bids": []
         };
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 200)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+          method: 'GET',
+          url: '$baseUrl/depth?market=anything&limit=300'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
@@ -123,12 +144,14 @@ void main() {
           ["12700.0","0.02401336"],
         ]};
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 200)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+          method: 'GET',
+          url: '$baseUrl/depth?market=btcbrl&limit=300'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
-        final subject = (await omniClient.fetchTicketsFromMarket('btcbrl')).body;
+        final subject = (await omniClient.fetchDepth('btcbrl')).body;
         expect(subject, expectedResult);
       });
     });
@@ -139,8 +162,10 @@ void main() {
       test('it returns empty list', () async {
         final expectedResult = [];
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 200)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+          method: 'GET',
+          url: '$baseUrl/trades?market=anything&since=null&limit=null&timestamp=null&until=null&order_by=null'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
@@ -164,8 +189,10 @@ void main() {
           },
         ];
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 200)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+          method: 'GET',
+          url: '$baseUrl/trades?market=btcbrl&since=null&limit=null&timestamp=null&until=null&order_by=null'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
@@ -177,7 +204,7 @@ void main() {
 
   group('fetchK', () {
     group('when market is invalid', () {
-      test('it returns http status 404', () async {
+      test('it returns http status 404', () {
         final expectedResult = {
           "error": {
             "code": 1002,
@@ -185,8 +212,10 @@ void main() {
           }
         };
 
-        final client = MockClient((request) async =>
-            Response(json.encode(expectedResult), 404)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 404),
+          method: 'GET',
+          url: '$baseUrl/k?market=anything&limit=null&period=1&timestamp=null'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
@@ -207,8 +236,10 @@ void main() {
           ],
         ];
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 200)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+          method: 'GET',
+          url: '$baseUrl/k?market=btcbrl&limit=null&period=1&timestamp=null'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
@@ -220,7 +251,7 @@ void main() {
 
   group('fetchKWithPendingTrades', () {
     group('when market is invalid', () {
-      test('it returns http status 404', () async {
+      test('it returns http status 404', () {
         final expectedResult = {
           "error": {
             "code": 1002,
@@ -228,8 +259,10 @@ void main() {
           }
         };
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 404)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 404),
+          method: 'GET',
+          url: '$baseUrl/k_with_pending_trades?market=anything&trade_id=1&limit=null&period=1'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
@@ -258,8 +291,10 @@ void main() {
           ]
         };
 
-        final client = MockClient((request) async =>
-          Response(json.encode(expectedResult), 200)
+        final client = mockHttp(
+          handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+          method: 'GET',
+          url: '$baseUrl/k_with_pending_trades?market=btcbrl&trade_id=1&limit=null&period=1'
         );
 
         final omniClient = OmniTradeClient(httpClient: client);
@@ -273,8 +308,10 @@ void main() {
     test('it returns server current time', () async {
       final expectedResult = 1549472661;
 
-      final client = MockClient((request) async =>
-        Response(json.encode(expectedResult), 200)
+      final client = mockHttp(
+        handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+        method: 'GET',
+        url: '$baseUrl/timestamp'
       );
 
       final omniClient = OmniTradeClient(httpClient: client);
@@ -291,8 +328,10 @@ void main() {
         "hidden": "string"
       };
 
-      final client = MockClient((request) async =>
-        Response(json.encode(expectedResult), 200)
+      final client = mockHttp(
+        handleRequest: (_) async => Response(json.encode(expectedResult), 200),
+        method: 'GET',
+        url: '$baseUrl/trezor/new_challenge'
       );
 
       final omniClient = OmniTradeClient(httpClient: client);
