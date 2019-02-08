@@ -1,11 +1,18 @@
 import "dart:async";
 import 'package:chopper/chopper.dart';
+import 'package:omnitrade_client/omnitrade_client.dart';
+import 'package:omnitrade_client/src/utils.dart';
 
-class OmniServices with ChopperServiceMixin {
+abstract class OmniTradePrivate {
+  Future<Response> _execPrivate(Request request);
+}
+
+class OmniServices with ChopperServiceMixin implements OmniTradePrivate {
   OmniServices([ChopperClient client]) {
     this.client = client;
   }
 
+  OmniCredentials credentials;
   final definitionType = OmniServices;
 
   /// Get all available markets.
@@ -99,4 +106,30 @@ class OmniServices with ChopperServiceMixin {
     final request = Request('GET', path);
     return client.send(request);
   }
+
+  /// Generate a new Trezor challenge
+  Future<Response> fetchMe() {
+    final path = '/members/me';
+    final request = Request('GET', path);
+    return _execPrivate(request);
+  }
+
+  Future<Response> _execPrivate(Request request) {
+    final parameters = <String, dynamic>{};
+    parameters
+      ..addAll(request.parameters)
+      ..addAll({
+        'access_key': credentials.accessKey,
+        'tonce': '$tonce'
+      });
+
+    final signature = generateSignature(
+      request.replace(parameters: parameters),
+      credentials
+    );
+
+    parameters.addAll({'signature': signature});
+    return client.send(request.replace(parameters: parameters));
+  }
 }
+

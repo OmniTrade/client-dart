@@ -1,11 +1,16 @@
 library omnitrade_client;
 
 import 'package:chopper/chopper.dart';
-import 'package:http/http.dart' as http;
 import 'src/services.dart';
+import 'package:http/http.dart' as http;
 
 /// Contains credentials to communicate with private API
-class OmniCredentials {}
+class OmniCredentials {
+  final String accessKey;
+  final String privateKey;
+
+  OmniCredentials({this.accessKey, this.privateKey});
+}
 
 /// A client to communicate with OmniTrade.io API.
 class OmniTradeClient extends OmniServices {
@@ -13,7 +18,7 @@ class OmniTradeClient extends OmniServices {
     credentials ??= OmniCredentials();
     httpClient ??= http.Client();
     client = ChopperClient(
-      baseUrl: 'https://omnitrade.io/api/v2',
+      baseUrl: 'https://staging.omnitrade.io/api/v2',
       jsonApi: true,
       client: httpClient
     );
