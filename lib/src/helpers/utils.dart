@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:chopper/chopper.dart';
-import '../omnitrade_client.dart';
+import '../../omnitrade_client.dart';
+import 'package:omnitrade_client/src/helpers/injector.dart';
 
 String generateSignature(Request request, OmniCredentials credentials) {
   final httpVerb = request.method.toUpperCase();
@@ -17,12 +18,15 @@ String generateSignature(Request request, OmniCredentials credentials) {
   return signature.convert(requestPayload).toString();
 }
 
-int get tonce => DateTime.now().millisecondsSinceEpoch;
+int get tonce => Injector().tonce;
 
 String mapToQueryParameter(Map<String, dynamic> queryParameters) {
   List<String> query_string = [];
+  final parametersKeys = queryParameters.keys.toList();
+  parametersKeys.sort();
 
-  queryParameters.forEach((String key, dynamic value) {
+  parametersKeys.forEach((String key) {
+    final value = queryParameters[key];
     String encoded_key = Uri.encodeComponent(key);
     String encoded_value = Uri.encodeComponent(value.toString());
     query_string.add('$encoded_key=$encoded_value');

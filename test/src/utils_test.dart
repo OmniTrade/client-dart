@@ -1,12 +1,12 @@
 import 'package:test/test.dart';
-import 'package:omnitrade_client/src/utils.dart';
+import 'package:omnitrade_client/src/helpers/utils.dart';
 import 'package:omnitrade_client/omnitrade_client.dart';
 import 'package:chopper/chopper.dart';
 
 void main() {
   final OmniCredentials credentials = OmniCredentials(
-      accessKey: 'xxx',
-      privateKey: 'yyy'
+    accessKey: 'xxx',
+    privateKey: 'yyy'
   );
 
   group('mapToQueryParameter', () {
@@ -37,7 +37,7 @@ void main() {
 
         expect(
           queryParameter,
-          'id=1&user=%7Bid%3A%201%7D&another=%5Bstr1%2C%20str2%5D'
+          'another=%5Bstr1%2C%20str2%5D&id=1&user=%7Bid%3A%201%7D'
         );
       });
     });
@@ -65,7 +65,7 @@ void main() {
         });
         final signature = generateSignature(request, credentials);
 
-        expect(signature, 'c01d1bfbdbcaca69d5d692b053387cd2513955b2946f7efd932d08dd1ca33ea6');
+        expect(signature, '458c61feaf71d6a405c476fc41b7ba55050c53fe9d850931da81dd6d964acf47');
       });
     });
   });
