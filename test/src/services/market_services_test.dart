@@ -8,7 +8,7 @@ import '../../helper.dart';
 
 void main() {
   setUpAll(() {
-    Injector.configure(kBaseUrl.contains('staging') ? Env.PROD : Env.TEST);
+    Injector.configure(Env.TEST);
   });
 
   describe('fetchMarkets', () {

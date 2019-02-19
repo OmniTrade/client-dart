@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:omnitrade_client/src/models/order.dart';
 import 'package:test/test.dart';
 import 'package:omnitrade_client/omnitrade_client.dart';
-import 'package:chopper/chopper.dart' as Chopper show Response;
 import 'package:omnitrade_client/src/helpers/injector.dart';
 import 'package:http/http.dart';
 import '../../helper.dart';
@@ -11,7 +10,7 @@ void main() {
   final fakeOrder = Order('brl', OrderSide.buy, '1.0');
 
   setUpAll(() {
-    Injector.configure(kBaseUrl.contains('staging') ? Env.PROD : Env.TEST);
+    Injector.configure(Env.TEST);
   });
 
   describe('fetchOrders', () {

@@ -1,5 +1,6 @@
 enum Env {
   TEST,
+  STAG,
   PROD,
 }
 

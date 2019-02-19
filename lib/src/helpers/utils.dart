@@ -34,4 +34,3 @@ String mapToQueryParameter(Map<String, dynamic> queryParameters) {
 
   return query_string.join('&');
 }
-
