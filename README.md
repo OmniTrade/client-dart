@@ -28,6 +28,17 @@ import 'package:omnitrade_client/omnitrade_client.dart';
 final client = OmniTradeClient();
 ``` 
 
+If you need to call private methods you'll be supposed to pass credentials
+
+```dart
+final client = OmniTradeClient(
+  accessKey: 'xxx',
+  privateKey: 'yyy'
+);
+```
+
+You can got the credentials [here](https://staging.omnitrade.io/api_tokens)
+
 3. Call Api method that you need
 
 ````dart
@@ -36,7 +47,7 @@ Future<void> yourFunction() async {
 }
 ````
 
-## Available methods
+## Public methods (not required credentials)
 
 - fetchMarkets
 - fetchTickets
@@ -48,6 +59,18 @@ Future<void> yourFunction() async {
 - fetchTimestamp
 - generateTrezorChallenge
 
+## Private methods (requires credentials)
+
+- fetchMe
+- fetchDeposits
+- fetchDeposit
+- fetchDepositAddress
+- fetchOrders
+- cancelOrders
+- fetchOrder
+- cancelOrder
+
 ## Todo
 
-- [] Add support to private API
+- createManyOrders
+- cancelOrdersBottom
